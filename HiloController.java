@@ -133,7 +133,7 @@ public class HiloController extends Thread {
 		
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"volumen\"/>Volumen</br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"fecha\"/>Fecha</br>\n";
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"ultimadecha\"/>Última fecha</br>\n";
+		html += "<input type=\"radio\" name=\"propiedad\" value=\"ultimafecha\"/>Última fecha</br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"led\"/>Led</input></br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"set\"/>Set led </input>\n";
 		html += "<input type=\"text\" id=\"valorLed\"/></br></br>\n";
