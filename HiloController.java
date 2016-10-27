@@ -40,7 +40,7 @@ public class HiloController extends Thread {
 		return "";
 	}
 	
-	public String procesarPeticion(String peticion) throws RemoteException, NotBoundException {
+	public String procesarPeticion(String peticion) throws RemoteException {
 		String html = "";
 		
 		html += "<html>\n";
@@ -51,25 +51,45 @@ public class HiloController extends Thread {
 		html += "<body>\n";
 		
 		if(peticion.contains("?sonda=")) {
-			int numSonda = Integer.parseInt(peticion.substring(peticion.indexOf("=")+1));
+			int numSonda;
 			
-			Registry registroRemoto = obtenerRegistroRemoto();
-			InterfazRemoto sonda = (InterfazRemoto) registroRemoto.lookup("/sonda" + numSonda);
-			
-			if(peticion.startsWith("volumen")) {
-				html += "<h1>Volumen: " + sonda.getVolumen() + "</h1>";
-			}
-			else if(peticion.startsWith("fecha")) {
-				html += "<h1>Fecha: " + sonda.getFecha() + " " + sonda.getHora() + "</h1>";
-			}
-			else if(peticion.startsWith("ultimafecha")) {
-				//html += "<h1>Última fecha: " + sonda.getFecha() + "</h1>";
-			}
-			else if(peticion.startsWith("led")) {
-				html += "<h1>Led: " + sonda.getLed() + "</h1>";
+			if(peticion.startsWith("set")) {
+				numSonda = Integer.parseInt(peticion.substring(peticion.indexOf("=")+1, peticion.indexOf("%")));
 			}
 			else {
-				html += "<h1>Error: propiedad no encontrada</h1>";
+				numSonda = Integer.parseInt(peticion.substring(peticion.indexOf("=")+1));
+			}
+			
+			Registry registroRemoto = obtenerRegistroRemoto();
+			InterfazRemoto sonda;
+			
+			try {
+				sonda = (InterfazRemoto) registroRemoto.lookup("/sonda" + numSonda);
+			
+				if(peticion.startsWith("volumen")) {
+					html += "<h1>Volumen: " + sonda.getVolumen() + "</h1>";
+				}
+				else if(peticion.startsWith("fecha")) {
+					html += "<h1>Fecha: " + sonda.getFecha() + "</h1>";
+				}
+				else if(peticion.startsWith("ultimafecha")) {
+					html += "<h1>Última fecha: " + sonda.getUltimaFecha() + "</h1>";
+				}
+				else if(peticion.startsWith("led")) {
+					html += "<h1>Led: " + sonda.getLed() + "</h1>";
+				}
+				else if(peticion.startsWith("set")) {
+					sonda.setLed(Integer.parseInt(peticion.substring(peticion.indexOf("%")+1)));
+					sonda.setUltimaFecha(sonda.getFecha());
+					
+					html += "<h1>Led modificado correctamente</h1>";
+				}
+				else {
+					html += "<h1>Error: variable no válida</h1>";
+				}
+			}
+			catch (NotBoundException e) {
+				html += "<h1>Error: el sensor no existe</h1>";
 			}
 		}
 		else {
@@ -114,7 +134,8 @@ public class HiloController extends Thread {
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"volumen\"/>Volumen</br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"fecha\"/>Fecha</br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"ultimadecha\"/>Última fecha</br>\n";
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"led\"/>Led</input>\n";
+		html += "<input type=\"radio\" name=\"propiedad\" value=\"led\"/>Led</input></br>\n";
+		html += "<input type=\"radio\" name=\"propiedad\" value=\"set\"/>Set led </input>\n";
 		html += "<input type=\"text\" id=\"valorLed\"/></br></br>\n";
 		
 		try{
@@ -148,7 +169,7 @@ public class HiloController extends Thread {
         try {
         	String[] peticion = leerSocket().split("/");
         	
-        	if(peticion[1].equals("") || peticion[1].equals("/index.html")) {
+        	if(peticion.length == 1 || peticion[1].equals("index.html")) {
         		escribeSocket(generarIndex());
         	}
         	else {

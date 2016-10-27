@@ -13,8 +13,10 @@
                                     break;
                     case "ultimafecha": url += "/ultimafecha?" + id;
                                     break;
-                    case "led":     var valor = document.getElementById("valorLed").value;
-                                    url += "/led?" + id + "?" + valor;
+                    case "led":     url += "/led?" + id;
+                                    break;
+                    case "set":     var valor = document.getElementById("valorLed").value;
+                                    url += "/set?" + id + "%" + valor;
                                     break;
                 }
                 

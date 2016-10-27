@@ -52,14 +52,14 @@ public class HiloServidor extends Thread {
 				}
 				
 				//Si la peticion es diferente se procesa en el servidor http
-				else {
+				else {					
 					File pagina = new File(s.substring(1));
 					
 					if(pagina.exists()) {
 						String html = "";
 						Scanner sc2 = new Scanner(pagina);
 						
-						while(sc.hasNextLine()) {
+						while(sc2.hasNextLine()) {
 							html += sc2.nextLine();
 						}
 						
@@ -78,7 +78,8 @@ public class HiloServidor extends Thread {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al leer peticion del navegador.");
+			e.printStackTrace();
 		}
 	}
 	
@@ -110,6 +111,15 @@ public class HiloServidor extends Thread {
 			
 			if(codigoRespuesta == 200) {
 				datos += 200;
+				
+				if(html.contains("host:puerto")) {
+					String s = new String(html.substring(0, html.indexOf("host")));
+					s += java.net.InetAddress.getLocalHost().getHostAddress() + ":";
+					s += port;
+					s += html.substring(html.indexOf("puerto")+6);
+					
+					html = s;
+				}
 			}
 			
 			else {
@@ -146,7 +156,8 @@ public class HiloServidor extends Thread {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error: " + e.toString());
+			System.out.println("Error al generar respuesta HTML");
+			e.printStackTrace();
 		}
 		return;
 	}
@@ -156,7 +167,7 @@ public class HiloServidor extends Thread {
 			OutputStream aux = skController.getOutputStream();
 			DataOutputStream flujo= new DataOutputStream(aux);
 			
-			flujo.writeUTF(url.split("/")[1]);
+			flujo.writeUTF(url.substring(1));
 			
 			System.out.println("Conectando con el controlador.");
 			

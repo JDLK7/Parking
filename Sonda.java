@@ -8,6 +8,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -16,7 +18,7 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 	private int numSensor;
 	private int volumen;
 	private String fecha;
-	private String hora;
+	private String ultimaFecha;
 	private int led;
 	
 	public Sonda() throws RemoteException {
@@ -28,13 +30,13 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		led = 0;
 	}
 	
-	public Sonda(int volumen, String fecha, String hora, int led) throws RemoteException {
+	public Sonda(int volumen, String fecha, String ultimaFecha, int led) throws RemoteException {
 		super();
 		
 		numSensor = -1;
 		this.volumen = volumen;
 		this.fecha = fecha;
-		this.hora = hora;
+		this.ultimaFecha = ultimaFecha;
 		this.led = led;
 	}
 	
@@ -50,26 +52,21 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		return volumen;
 	}
 
-	public void setVolumen(int volumen) {
-		this.volumen = volumen;
-	}
-
 	public String getFecha() {
-		return fecha;
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date f = new Date();
+		
+		return dateFormat.format(f);
+	}
+	
+	public String getUltimaFecha() {
+		return ultimaFecha;
 	}
 
-	public void setFecha(String fecha) {
-		this.fecha = fecha;
+	public void setUltimaFecha(String ultimaFecha) {
+		this.ultimaFecha = ultimaFecha;
 	}
-	
-	public String getHora() {
-		return hora;
-	}
-	
-	public void setHora(String hora) {
-		this.hora = hora;
-	}
-	
+
 	public int getLed() {
 		return led;
 	}
@@ -94,10 +91,10 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		line = line.substring(line.indexOf('=')+1);
 		volumen = Integer.parseInt(line);
 		
-		fecha = sc.next();
-		fecha = fecha.substring(fecha.indexOf('=')+1);
+		ultimaFecha = sc.next();
+		ultimaFecha = ultimaFecha.substring(ultimaFecha.indexOf('=')+1);
 		
-		hora = sc.next();
+		ultimaFecha += " " + sc.next();
 		
 		line = sc.next();
 		line = line.substring(line.indexOf('=')+1);
@@ -109,7 +106,7 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 	}
 	
 	public String estadoSensor() {
-		return "Volumen=" + getVolumen() + "\nFecha="+ getFecha().toString() + "\nLed=" + getLed() + "\n";
+		return "Volumen=" + getVolumen() + "\nFecha="+ getFecha().toString() + "\nUltimaFecha=" + getUltimaFecha() + "\nLed=" + getLed() + "\n";
 	}
 	
 	public static void main(String[] args) throws RemoteException {
@@ -128,6 +125,8 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		puerto = Integer.parseInt(args[2]);
 		
 		sonda.comprobarSensor();
+		
+		System.out.println(sonda.estadoSensor());
 		
 		System.setSecurityManager(new RMISecurityManager());
 		
