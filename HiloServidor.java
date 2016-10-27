@@ -42,40 +42,38 @@ public class HiloServidor extends Thread {
 					s = sc.next();
 				}
 				
-				if(s.equals("/index.html") || s.equals("/")) {
-					escribeSocketNavegador(skNavegador, 200, "");
-				}
-				
-				//Si la pagina se le pide al controlador.
-				else if(s.startsWith("/controladorSD")) {
-					//Si se pide el indice de la pagina de los sensores.
-					if(s.equals("/controladorSD/index.html") || s.equals("/controladorSD")) {
-						skController = new Socket(host, portController);
-						escribirSocketController("/index.html");
-						
-						String html = leerSocketController();
-						escribeSocketNavegador(skNavegador, 200, html);
-					}
+				//Si la peticion es para el controlador, se delega en el.
+				if(s.startsWith("/controladorSD")) {
+					skController = new Socket(host,portController);
+					escribirSocketController(s);
 					
-					//Si se pide otra cosa se le pasa al controlador.
-					else {
-						skController = new Socket(host, portController);
-						escribirSocketController(s);
-						
-						String html = leerSocketController();
-						escribeSocketNavegador(skNavegador, 200, html);
-					}
+					String html = leerSocketController();
+					escribeSocketNavegador(200, html);
 				}
 				
-				//En otro caso la respuesta será error 404.
+				//Si la peticion es diferente se procesa en el servidor http
 				else {
-					escribeSocketNavegador(skNavegador,404,"");
+					File pagina = new File(s.substring(1));
+					
+					if(pagina.exists()) {
+						String html = "";
+						Scanner sc2 = new Scanner(pagina);
+						
+						while(sc.hasNextLine()) {
+							html += sc2.nextLine();
+						}
+						
+						escribeSocketNavegador(200, html);
+					}
+					else {
+						escribeSocketNavegador(404, "");
+					}
 				}
 			}
 			
 			//Como otro método diferente no está permitido, se envía un código de error
 			else {
-				escribeSocketNavegador(skNavegador, 405, "");
+				escribeSocketNavegador(405, "");
 			}
 		}
 		catch (Exception e)
@@ -100,7 +98,7 @@ public class HiloServidor extends Thread {
 	}
 	
 	//Escribe en el socket los datos HTML de la página de respuesta a la petición.
-	public void escribeSocketNavegador (Socket skNavegador, int codigoRespuesta, String html)
+	public void escribeSocketNavegador (int codigoRespuesta, String html)
 	{
 		try
 		{
@@ -119,9 +117,6 @@ public class HiloServidor extends Thread {
 				html = "";
 				
 				switch(codigoRespuesta) {
-					case 200: datos += 200;
-						pagHtml = "index.html";
-						break;
 					case 404: datos += 404;
 						pagHtml = "error404.html";
 						break;

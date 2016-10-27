@@ -40,36 +40,46 @@ public class HiloController extends Thread {
 		return "";
 	}
 	
-	public void lecturaSonda(String s) throws RemoteException, NotBoundException {
-		if(s.contains("?sonda=")) {
+	public String procesarPeticion(String peticion) throws RemoteException, NotBoundException {
+		String html = "";
+		
+		html += "<html>\n";
+		html += "<head>\n";
+		html += "<title>Parking ultragenerasión</title>\n";
+		html += "</head>\n";
+		
+		html += "<body>\n";
+		
+		if(peticion.contains("?sonda=")) {
+			int numSonda = Integer.parseInt(peticion.substring(peticion.indexOf("=")+1));
 			
 			Registry registroRemoto = obtenerRegistroRemoto();
-			int numSonda = Integer.parseInt(s.substring(s.indexOf("=")+1));
+			InterfazRemoto sonda = (InterfazRemoto) registroRemoto.lookup("/sonda" + numSonda);
 			
-			if(s.contains("volumen")) {
-				int volumen = descargarSonda(registroRemoto, numSonda).getVolumen();
+			if(peticion.startsWith("volumen")) {
+				html += "<h1>Volumen: " + sonda.getVolumen() + "</h1>";
 			}
-			else if(s.contains("fecha")) {
-				String fecha = descargarSonda(registroRemoto, numSonda).getFecha();
+			else if(peticion.startsWith("fecha")) {
+				html += "<h1>Fecha: " + sonda.getFecha() + " " + sonda.getHora() + "</h1>";
 			}
-			else if(s.contains("ultimaFecha")) {
-				
+			else if(peticion.startsWith("ultimafecha")) {
+				//html += "<h1>Última fecha: " + sonda.getFecha() + "</h1>";
 			}
-			else if(s.contains("led")) {
-				
+			else if(peticion.startsWith("led")) {
+				html += "<h1>Led: " + sonda.getLed() + "</h1>";
 			}
-			
-			//URL mal introducida
 			else {
-				
+				html += "<h1>Error: propiedad no encontrada</h1>";
 			}
 		}
-		//URL mal introducida
 		else {
-			
+			html += "<h1>Error: recurso no encontrado</h1>";
 		}
 		
+		html += "</body>\n";
+		html += "</html>\n";
 		
+		return html;	
 	}
 	
 	public Registry obtenerRegistroRemoto() {
@@ -85,11 +95,7 @@ public class HiloController extends Thread {
 		return null;
 	}
 	
-	public InterfazRemoto descargarSonda(Registry reg, int numSonda) throws AccessException, RemoteException, NotBoundException {
-		return (InterfazRemoto) reg.lookup("/sonda" + numSonda);
-	}
-	
-	public String generarHtml() throws FileNotFoundException {
+	public String generarIndex() throws FileNotFoundException {
 		String html = "";
 		
 		html += "<html>\n";
@@ -140,14 +146,14 @@ public class HiloController extends Thread {
 	
 	public void run() {        
         try {
-        	String peticion = leerSocket();
+        	String[] peticion = leerSocket().split("/");
         	
-        	if(peticion.equals("index.html")) {
-        		escribeSocket(generarHtml());
+        	if(peticion[1].equals("") || peticion[1].equals("/index.html")) {
+        		escribeSocket(generarIndex());
         	}
-        	
-			//lecturaSonda(leerSocket());
-			//escribeSocket(skCliente, Cadena);
+        	else {
+        		escribeSocket(procesarPeticion(peticion[1]));
+        	}
 			
 			skHttpServer.close();
         }
