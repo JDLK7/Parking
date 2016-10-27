@@ -1,0 +1,25 @@
+<script type="text/javascript">
+    function generarUrl(id) {
+        var rad = document.getElementsByName("propiedad");
+
+        for(var i=0; i<rad.length; i++) {
+            if(rad[i].checked) {
+                var url = "http://host:puerto/controladorSD";
+
+                switch(rad[i].value) {
+                    case "volumen": url += "/volumen?" + id;
+                                    break;
+                    case "fecha":   url += "/fecha?" + id;
+                                    break;
+                    case "ultimafecha": url += "/ultimafecha?" + id;
+                                    break;
+                    case "led":     var valor = document.getElementById("valorLed").value;
+                                    url += "/led?" + id + "?" + valor;
+                                    break;
+                }
+                
+                window.location = url;
+            }
+        }
+    }
+</script>
