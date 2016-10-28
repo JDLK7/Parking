@@ -78,8 +78,7 @@ public class HiloServidor extends Thread {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error al leer peticion del navegador.");
-			e.printStackTrace();
+			escribeSocketNavegador(409, "");
 		}
 	}
 	
