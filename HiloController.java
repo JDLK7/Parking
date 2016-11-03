@@ -78,6 +78,11 @@ public class HiloController extends Thread {
 				else if(peticion.startsWith("led")) {
 					html += "<h1>Led: " + sonda.getLed() + "</h1>";
 				}
+				else if(peticion.startsWith("setVolumen")) {
+					sonda.setVolumen(Integer.parseInt(peticion.substring(peticion.indexOf("%")+1)));
+					
+					html += "<h1>Volumen modificado correctamente</h1>";
+				}
 				else if(peticion.startsWith("set")) {
 					sonda.setLed(Integer.parseInt(peticion.substring(peticion.indexOf("%")+1)));
 					sonda.setUltimaFecha(sonda.getFecha());
@@ -117,7 +122,20 @@ public class HiloController extends Thread {
 	
 	public String generarIndex() throws FileNotFoundException {
 		String html = "";
-		
+
+		Scanner sc = new Scanner(new File("controllerIndex.html"));
+
+		while(sc.hasNextLine()) {
+			String s = sc.nextLine() + "\n";
+
+			if(s.contains("<!---->")) {
+				break;
+			}
+			else {
+				html += s;
+			}
+		}
+		/*
 		html += "<html>\n";
 		html += "<head>\n";
 		html += "<title>Parking ultragenerasión</title>\n";
@@ -132,12 +150,16 @@ public class HiloController extends Thread {
 		html += "<body>\n";
 		
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"volumen\"/>Volumen</br>\n";
+		html += "<input type=\"radio\" name=\"propiedad\" value=\"setVolumen\"/>Set volumen </input>\n";
+		html += "<input type=\"text\" id=\"valorVolumen\"/></br>\n";
+
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"fecha\"/>Fecha</br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"ultimafecha\"/>Última fecha</br>\n";
+
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"led\"/>Led</input></br>\n";
 		html += "<input type=\"radio\" name=\"propiedad\" value=\"set\"/>Set led </input>\n";
 		html += "<input type=\"text\" id=\"valorLed\"/></br></br>\n";
-		
+		*/
 		try{
 			String[] objetosRemotos = obtenerRegistroRemoto().list();
 			
@@ -151,7 +173,8 @@ public class HiloController extends Thread {
 			System.out.println("Error al listar sondas");
 			ex.printStackTrace();
 		}
-				
+
+		html += "</div>\n";	
 		html += "</body>\n";
 		html += "</html>\n";
 		

@@ -52,6 +52,10 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		return volumen;
 	}
 
+	public void setVolumen(int volumen) {
+		this.volumen = volumen;
+	}
+
 	public String getFecha() {
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		Date f = new Date();

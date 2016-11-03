@@ -1,0 +1,98 @@
+<html>
+<head>
+    <title>Parking ultragenerasión</title>
+    <style>
+        .columna1 {
+            width: 40%;
+            float: left;
+            padding: 3em;
+        }
+
+        .columna2 {
+            width: 40%;
+            float: right;
+            padding: 3em;
+        }
+
+        .contenedor {
+            width: 100%;
+        }
+
+        .botones {
+            width: 100%;
+            text-align:center;
+            display: inline-block;
+        }
+
+        .botones > h1 {
+            font-size: 3em;
+        }
+
+        h1 {
+            color: #323232;
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        body {
+            background-color: #ECF0F1;
+        }
+    </style>
+
+    <script type="text/javascript">
+    function generarUrl(id) {
+        var rad = document.getElementsByName("propiedad");
+
+        for(var i=0; i<rad.length; i++) {
+            if(rad[i].checked) {
+                var url = "http://host:puerto/controladorSD";
+
+                switch(rad[i].value) {
+                    case "volumen": url += "/volumen?" + id;
+                                    break;
+                    case "fecha":   url += "/fecha?" + id;
+                                    break;
+                    case "ultimafecha": url += "/ultimafecha?" + id;
+                                    break;
+                    case "led":     url += "/led?" + id;
+                                    break;
+                    case "setVolumen": var valor = document.getElementById("valorVolumen") .value;
+                                    url += "/setVolumen?" + id + "%" + valor;
+                                    break;
+                    case "set":     var valor = document.getElementById("valorLed").value;
+                                    url += "/set?" + id + "%" + valor;
+                                    break;
+                }
+                
+                window.location = url;
+            }
+        }
+    }
+</script>
+</head>
+
+<body>
+    <div class="contenedor">
+        <div class="columna1">
+            <h1>Información de la plaza</h1>
+            <input type="radio" name="propiedad" value="volumen"/>Volumen</br>
+            <input type="radio" name="propiedad" value="fecha"/>Fecha</br>
+            <input type="radio" name="propiedad" value="ultimafecha"/>Última fecha</br>
+            <input type="radio" name="propiedad" value="led"/>Led</input></br>
+        </div>
+
+        <div class="columna2">
+            <h1>Modificar Información de la plaza</h1>
+            <input type="radio" name="propiedad" value="setVolumen"/>Set volumen </input>
+            <input type="text" id="valorVolumen"/></br>
+            <input type="radio" name="propiedad" value="set"/>Set led </input>
+            <input type="text" id="valorLed"/></br></br>
+        </div>
+    </div>
+    
+    <div class="botones">
+        <h1>Sensores disponibles</h1>
+        <!---->
+    </div>
+</body>
+</html>

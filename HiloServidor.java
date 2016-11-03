@@ -52,7 +52,7 @@ public class HiloServidor extends Thread {
 				}
 				
 				//Si la peticion es diferente se procesa en el servidor http
-				else {					
+				else {		
 					File pagina = new File(s.substring(1));
 					
 					if(pagina.exists()) {
