@@ -17,11 +17,13 @@ import java.util.Scanner;
 public class HiloController extends Thread {
 	
 	private Socket skHttpServer;
+	private String hostRMI;
 	private int portRMI;
 	
-	public HiloController(Socket p_cliente, int portRMI)
+	public HiloController(Socket p_cliente, String hostRMI, int portRMI)
 	{
 		this.skHttpServer = p_cliente;
+		this.hostRMI = hostRMI;
 		this.portRMI = portRMI;
 	}
 	
@@ -48,7 +50,9 @@ public class HiloController extends Thread {
 		html += "<title>Parking ultragenerasión</title>\n";
 		html += "</head>\n";
 		
-		html += "<body>\n";
+		html += "<body style=\"background-color: #ECF0F1;\">\n";
+
+		String style = " style=\"color: #323232; text-align: center;\"";
 		
 		if(peticion.contains("?sonda=")) {
 			int numSonda;
@@ -67,38 +71,48 @@ public class HiloController extends Thread {
 				sonda = (InterfazRemoto) registroRemoto.lookup("/sonda" + numSonda);
 			
 				if(peticion.startsWith("volumen")) {
-					html += "<h1>Volumen: " + sonda.getVolumen() + "</h1>";
+					int volumen = sonda.getVolumen();
+					String color = ""; 
+
+					html += "<h1" + style + ">Volumen: " + volumen + "</h1>";
+					
+					if(volumen == 0) {
+						color = "green";
+					}
+					else if(volumen > 0 && volumen < 30) {
+						color = "#FFBF00";
+					}
+					else {
+						color = "red";
+					}
+					
+					html += "<div style=\"width: 50px; height:50px; -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px; background: " + color + "; margin-left: 50%;\"></div>";
 				}
 				else if(peticion.startsWith("fecha")) {
-					html += "<h1>Fecha: " + sonda.getFecha() + "</h1>";
+					html += "<h1" + style + ">Fecha: " + sonda.getFecha() + "</h1>";
 				}
 				else if(peticion.startsWith("ultimafecha")) {
-					html += "<h1>Última fecha: " + sonda.getUltimaFecha() + "</h1>";
+					html += "<h1" + style + ">Última fecha: " + sonda.getUltimaFecha() + "</h1>";
 				}
 				else if(peticion.startsWith("led")) {
-					html += "<h1>Led: " + sonda.getLed() + "</h1>";
-				}
-				else if(peticion.startsWith("setVolumen")) {
-					sonda.setVolumen(Integer.parseInt(peticion.substring(peticion.indexOf("%")+1)));
-					
-					html += "<h1>Volumen modificado correctamente</h1>";
+					html += "<h1" + style + ">Led: " + sonda.getLed() + "</h1>";
 				}
 				else if(peticion.startsWith("set")) {
 					sonda.setLed(Integer.parseInt(peticion.substring(peticion.indexOf("%")+1)));
 					sonda.setUltimaFecha(sonda.getFecha());
 					
-					html += "<h1>Led modificado correctamente</h1>";
+					html += "<h1" + style +">Led modificado correctamente</h1>";
 				}
 				else {
-					html += "<h1>Error: variable no válida</h1>";
+					html += "<h1" + style + ">Error: variable no válida</h1>";
 				}
 			}
 			catch (NotBoundException e) {
-				html += "<h1>Error: el sensor no existe</h1>";
+				html += "<h1" + style + ">Error: el sensor no existe</h1>";
 			}
 		}
 		else {
-			html += "<h1>Error: recurso no encontrado</h1>";
+			html += "<h1" + style + ">Error: recurso no encontrado</h1>";
 		}
 		
 		html += "</body>\n";
@@ -110,7 +124,7 @@ public class HiloController extends Thread {
 	public Registry obtenerRegistroRemoto() {
 		try{
 			System.setSecurityManager(new RMISecurityManager());
-			return LocateRegistry.getRegistry(portRMI);
+			return LocateRegistry.getRegistry(hostRMI, portRMI);
 		}
 		catch(RemoteException ex) {
 			System.out.println("Error al instanciar el objeto remoto " + ex);
@@ -135,37 +149,13 @@ public class HiloController extends Thread {
 				html += s;
 			}
 		}
-		/*
-		html += "<html>\n";
-		html += "<head>\n";
-		html += "<title>Parking ultragenerasión</title>\n";
-		
-		Scanner sc = new Scanner(new File("script"));
-		while(sc.hasNextLine()) {
-			html += sc.nextLine() + "\n";
-		}
-		
-		html += "</head>\n";
-		
-		html += "<body>\n";
-		
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"volumen\"/>Volumen</br>\n";
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"setVolumen\"/>Set volumen </input>\n";
-		html += "<input type=\"text\" id=\"valorVolumen\"/></br>\n";
 
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"fecha\"/>Fecha</br>\n";
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"ultimafecha\"/>Última fecha</br>\n";
-
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"led\"/>Led</input></br>\n";
-		html += "<input type=\"radio\" name=\"propiedad\" value=\"set\"/>Set led </input>\n";
-		html += "<input type=\"text\" id=\"valorLed\"/></br></br>\n";
-		*/
 		try{
 			String[] objetosRemotos = obtenerRegistroRemoto().list();
 			
 			for(int i=0; i<objetosRemotos.length; i++) {
 				if(objetosRemotos[i].contains("/sonda")) {
-					html += "<input type=\"button\" id=\"sonda=" + objetosRemotos[i].substring(6) + "\" value=\"Sonda " + objetosRemotos[i].substring(6) + "\" onclick=\"generarUrl(this.id);\"></br>\n";
+					html += "<input type=\"button\" id=\"sonda=" + objetosRemotos[i].substring(6) + "\" value=\"Sonda " + objetosRemotos[i].substring(6) + "\" onclick=\"generarUrl(this.id);\">\n";
 				}
 			}
 		}

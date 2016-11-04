@@ -5,7 +5,6 @@ public interface InterfazRemoto extends Remote {
 	public Sonda getSensor() throws RemoteException;
 	
 	public int getVolumen() throws RemoteException;
-	public void setVolumen(int volumen) throws RemoteException;
 	public String getFecha() throws RemoteException;
 	public String getUltimaFecha() throws RemoteException;
 	public void setUltimaFecha(String ultimaFecha) throws RemoteException;

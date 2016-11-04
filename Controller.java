@@ -5,13 +5,14 @@ import java.rmi.*;
 
 public class Controller {
 	public static void main(String[] args) {
-		if(args.length < 1) {
-			System.out.println("Se tiene que introducir el puerto de escucha.");
+		if(args.length < 3) {
+			System.out.println("Se tiene que introducir el puerto de escucha, el host del registro remoto y el puerto del registro remoto.");
 			System.exit(1);
 		}
 		
 		int puerto = Integer.parseInt(args[0]);
-		int puertoRMI = Integer.parseInt(args[1]);
+		String hostRMI = args[1];
+		int puertoRMI = Integer.parseInt(args[2]);
 		
 		try {
 			ServerSocket skServidor = new ServerSocket(puerto);
@@ -22,7 +23,7 @@ public class Controller {
 				
 				System.out.println("Conectado con el servidor...");
 				
-				Thread t = new HiloController(skCliente, puertoRMI);
+				Thread t = new HiloController(skCliente, hostRMI, puertoRMI);
 				t.start();
 			}
 		}

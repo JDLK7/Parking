@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.io.PrintWriter;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
@@ -52,10 +53,6 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		return volumen;
 	}
 
-	public void setVolumen(int volumen) {
-		this.volumen = volumen;
-	}
-
 	public String getFecha() {
 		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		Date f = new Date();
@@ -69,6 +66,33 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 
 	public void setUltimaFecha(String ultimaFecha) {
 		this.ultimaFecha = ultimaFecha;
+
+		try {
+			File f = new File("Sensor" + numSensor);
+			Scanner sc = new Scanner(f);
+			String s = "";
+
+			while(sc.hasNextLine()) {
+				s += sc.nextLine() + "\n";
+			}
+
+			String resultado = "";
+
+			resultado = s.substring(0, s.indexOf("UltimaFecha=") + 12);
+			resultado += ultimaFecha + "\n";
+			resultado += s.substring(s.indexOf("Led"));
+
+			PrintWriter pw = new PrintWriter("Sensor" + numSensor);
+			pw.write(resultado);
+
+			pw.close();
+		}
+
+		catch(FileNotFoundException e) {
+			System.out.println("El nombre del fichero no es válido: " + numSensor);
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	public int getLed() {
@@ -77,6 +101,32 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 
 	public void setLed(int led) {
 		this.led = led;
+		
+		try {
+			File f = new File("Sensor" + numSensor);
+			Scanner sc = new Scanner(f);
+			String s = "";
+
+			while(sc.hasNextLine()) {
+				s += sc.nextLine() + "\n";
+			}
+
+			String resultado = "";
+
+			resultado = s.substring(0, s.indexOf("Led=") + 4);
+			resultado += led;
+
+			PrintWriter pw = new PrintWriter("Sensor" + numSensor);
+			pw.write(resultado);
+
+			pw.close();
+		}
+
+		catch(FileNotFoundException e) {
+			System.out.println("El nombre del fichero no es válido: " + numSensor);
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 	
 	//La excepcion se captura pero casi mejor si se lanza.
@@ -141,5 +191,22 @@ public class Sonda extends UnicastRemoteObject implements InterfazRemoto, Serial
 		} catch (NotBoundException e) {
 			e.printStackTrace();
 		}
+
+		/* DESREGISTRAR SONDA
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(200);
+					System.out.println("Desregistrando sonda...");
+					//some cleaning up code...
+
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		*/
 	}
 }

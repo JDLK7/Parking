@@ -42,8 +42,11 @@ public class HiloServidor extends Thread {
 					s = sc.next();
 				}
 				
+				if(s.equals("/")) {
+					escribeSocketNavegador(-1, "");
+				}
 				//Si la peticion es para el controlador, se delega en el.
-				if(s.startsWith("/controladorSD")) {
+				else if(s.startsWith("/controladorSD")) {
 					skController = new Socket(host,portController);
 					escribirSocketController(s);
 					
@@ -126,6 +129,9 @@ public class HiloServidor extends Thread {
 				html = "";
 				
 				switch(codigoRespuesta) {
+					case -1: datos += 200;
+						pagHtml = "index.html";
+						break;
 					case 404: datos += 404;
 						pagHtml = "error404.html";
 						break;
